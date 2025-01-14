@@ -1,0 +1,31 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.course_list, name='course_list'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('create/', views.create_course, name='create_course'),
+    path('<int:pk>/', views.course_detail, name='course_detail'),
+    path('<int:pk>/enroll/', views.enroll_course, name='enroll_course'),
+    path('<int:pk>/unenroll/', views.unenroll_course, name='unenroll_course'),
+    path('<int:course_id>/attendance/', views.mark_attendance, name='mark_attendance'),
+    path('<int:course_id>/attendance/view/', views.view_attendance, name='view_attendance'),
+    path('assignment/<int:assignment_id>/submit/', views.submit_assignment, name='submit_assignment'),
+    path('assignment/<int:assignment_id>/grade/', views.grade_assignment, name='grade_assignment'),
+    path('quiz/<int:quiz_id>/take/', views.take_quiz, name='take_quiz'),
+    path('quiz/<int:pk>/results/', views.quiz_results, name='quiz_results'),
+    path('<int:course_id>/student/<int:student_id>/progress/', views.student_progress, name='student_progress'),
+    path('<int:course_id>/announcements/', views.announcement_list, name='announcement_list'),
+    path('<int:course_id>/announcements/create/', views.create_announcement, name='create_announcement'),
+    path('<int:course_id>/schedule/', views.course_schedule, name='course_schedule'),
+    path('<int:course_id>/discussions/', views.discussion_list, name='discussion_list'),
+    path('<int:course_id>/discussions/create/', views.create_discussion, name='create_discussion'),
+    path('discussion/<int:topic_id>/', views.discussion_detail, name='discussion_detail'),
+    path('<int:course_id>/meetings/', views.video_meetings, name='video_meetings'),
+    path('<int:course_id>/meetings/create/', views.create_meeting, name='create_meeting'),
+    path('meeting/<int:meeting_id>/join/', views.join_meeting, name='join_meeting'),
+    path('<int:course_id>/meetings/calendar/', views.meeting_calendar, name='meeting_calendar'),
+    path('meeting/<int:meeting_id>/attendance/', views.track_attendance, name='track_attendance'),
+    path('meeting/<int:meeting_id>/attendance/view/', views.get_meeting_attendance, name='get_meeting_attendance'),
+    path('course/<int:course_id>/meetings/events/', views.get_meeting_events, name='get_meeting_events'),
+] 

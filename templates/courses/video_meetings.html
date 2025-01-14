@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Video Meetings - {{ course.title }}</h2>
+        </div>
+        {% if can_create %}
+        <div class="col-md-4 text-end">
+            <a href="{% url 'create_meeting' course.id %}" class="btn btn-primary">
+                <i class="fas fa-video"></i> Schedule Meeting
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            {% for meeting in meetings %}
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ meeting.title }}</h5>
+                        <span class="badge bg-primary">
+                            {% if meeting.is_recurring %}Recurring{% endif %}
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <p><i class="far fa-clock"></i> {{ meeting.scheduled_time|date:"M d, Y H:i" }}</p>
+                                <p><i class="far fa-hourglass"></i> Duration: {{ meeting.duration }} minutes</p>
+                                <p><i class="far fa-user"></i> Host: {{ meeting.created_by.username }}</p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                {% if meeting.scheduled_time|date:"Y-m-d H:i" <= now|date:"Y-m-d H:i" %}
+                                    <a href="{% url 'join_meeting' meeting.id %}" class="btn btn-success">
+                                        <i class="fas fa-video"></i> Join Meeting
+                                    </a>
+                                {% else %}
+                                    <button class="btn btn-secondary" disabled>
+                                        Not Started Yet
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="alert alert-info">No upcoming meetings scheduled.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

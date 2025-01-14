@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Create Quiz - {{ course.title }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="quiz-form">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        
+                        <div id="questions-container">
+                            <h4 class="mt-4">Questions</h4>
+                            {{ question_formset.management_form }}
+                            {% for question_form in question_formset %}
+                                <div class="question-form mb-4">
+                                    <h5>Question {{ forloop.counter }}</h5>
+                                    {{ question_form|crispy }}
+                                    
+                                    {% if question_form.instance.question_type == 'mcq' %}
+                                        <div class="choices-container">
+                                            <h6>Choices</h6>
+                                            {{ choice_formsets|get_item:forloop.counter0|crispy }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <button type="button" id="add-question" class="btn btn-secondary mt-3">
+                            Add Question
+                        </button>
+                        <button type="submit" class="btn btn-primary mt-3">Create Quiz</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const questionTypeSelects = document.querySelectorAll('select[name$="-question_type"]');
+    questionTypeSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            const choicesContainer = this.closest('.question-form').querySelector('.choices-container');
+            if (this.value === 'mcq') {
+                choicesContainer.style.display = 'block';
+            } else {
+                choicesContainer.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 

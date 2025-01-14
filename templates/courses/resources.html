@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Course Resources - {{ course.title }}</h2>
+        </div>
+        {% if user.is_instructor %}
+        <div class="col-md-4 text-end">
+            <a href="{% url 'create_resource' course.id %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Resource
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <!-- Categories Sidebar -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Categories</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for category in categories %}
+                        <a href="#category-{{ category.id }}" 
+                           class="list-group-item list-group-item-action">
+                            {{ category.name }}
+                            <span class="badge bg-primary float-end">
+                                {{ category.resources.count }}
+                            </span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            {% for category in categories %}
+                <div id="category-{{ category.id }}" class="card mb-4">
+                    <div class="card-header">
+                        <h4>{{ category.name }}</h4>
+                        <p class="text-muted mb-0">{{ category.description }}</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            {% for resource in category.resources.all %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-1">{{ resource.title }}</h5>
+                                            <p class="mb-1">{{ resource.description }}</p>
+                                        </div>
+                                        <div>
+                                            {% if resource.file %}
+                                                <a href="{{ resource.file.url }}" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-download"></i> Download
+                                                </a>
+                                            {% endif %}
+                                            {% if resource.url %}
+                                                <a href="{{ resource.url }}" 
+                                                   class="btn btn-sm btn-outline-primary"
+                                                   target="_blank">
+                                                    <i class="fas fa-external-link-alt"></i> Visit
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <p class="text-muted">No resources in this category.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

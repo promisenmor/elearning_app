@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'course_detail' topic.course.id %}">{{ topic.course.title }}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'discussion_list' topic.course.id %}">Discussions</a></li>
+                    <li class="breadcrumb-item active">{{ topic.title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <!-- Main Topic -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="mb-0">{{ topic.title }}</h3>
+                    <small class="text-muted">
+                        Posted by {{ topic.created_by.username }} on {{ topic.created_at|date:"M d, Y H:i" }}
+                    </small>
+                </div>
+                <div class="card-body">
+                    {{ topic.content|linebreaks }}
+                </div>
+            </div>
+
+            <!-- Replies -->
+            <div class="replies-section">
+                {% for reply in replies %}
+                    <div class="card mb-3 {% if reply.parent_reply %}ms-5{% endif %}">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <img src="{{ reply.created_by.profile_picture.url|default:'/static/images/default-avatar.png' }}" 
+                                     class="rounded-circle" style="width: 30px; height: 30px;">
+                                <span class="ms-2">{{ reply.created_by.username }}</span>
+                            </div>
+                            <small class="text-muted">{{ reply.created_at|date:"M d, Y H:i" }}</small>
+                        </div>
+                        <div class="card-body">
+                            {{ reply.content|linebreaks }}
+                            <button class="btn btn-sm btn-link reply-button" 
+                                    data-parent="{{ reply.id }}">Reply</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Reply Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>Add Reply</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button type="submit" class="btn btn-primary">Post Reply</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const replyButtons = document.querySelectorAll('.reply-button');
+    replyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const parentId = this.dataset.parent;
+            const replyForm = document.querySelector('#reply-form');
+            const parentInput = document.querySelector('#id_parent_reply');
+            parentInput.value = parentId;
+            replyForm.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 

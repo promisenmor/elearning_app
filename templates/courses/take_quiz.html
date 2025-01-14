@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h3>{{ quiz.title }}</h3>
+                <p class="mb-0">Time Limit: {{ quiz.time_limit }} minutes</p>
+                <p id="timer" class="mb-0 text-danger"></p>
+            </div>
+            <div class="card-body">
+                <form method="post" id="quiz-form">
+                    {% csrf_token %}
+                    {% for question in quiz.questions.all %}
+                    <div class="mb-4">
+                        <h5>{{ forloop.counter }}. {{ question.question_text }}</h5>
+                        {% if question.question_type == 'mcq' %}
+                            {% for choice in question.choices.all %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" 
+                                       name="question_{{ question.id }}" 
+                                       value="{{ choice.id }}" 
+                                       id="choice_{{ choice.id }}">
+                                <label class="form-check-label" for="choice_{{ choice.id }}">
+                                    {{ choice.choice_text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        {% elif question.question_type == 'true_false' %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" 
+                                       name="question_{{ question.id }}" 
+                                       value="true" id="true_{{ question.id }}">
+                                <label class="form-check-label" for="true_{{ question.id }}">True</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" 
+                                       name="question_{{ question.id }}" 
+                                       value="false" id="false_{{ question.id }}">
+                                <label class="form-check-label" for="false_{{ question.id }}">False</label>
+                            </div>
+                        {% elif question.question_type == 'short_answer' %}
+                            <textarea class="form-control" name="question_{{ question.id }}"></textarea>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary">Submit Quiz</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Timer functionality
+    const timeLimit = {{ quiz.time_limit }} * 60; // Convert to seconds
+    let timeLeft = timeLimit;
+    
+    function updateTimer() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        document.getElementById('timer').textContent = 
+            `Time Remaining: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeLeft === 0) {
+            document.getElementById('quiz-form').submit();
+        } else {
+            timeLeft--;
+            setTimeout(updateTimer, 1000);
+        }
+    }
+    
+    updateTimer();
+</script>
+{% endblock %}
+{% endblock %} 

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Student Groups - {{ course.title }}</h2>
+        </div>
+        {% if user.is_instructor %}
+        <div class="col-md-4 text-end">
+            <a href="{% url 'create_group' course.id %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create Group
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        {% for group in groups %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">{{ group.name }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>Members:</h6>
+                        <ul class="list-unstyled">
+                            {% for member in group.members.all %}
+                                <li>
+                                    <img src="{{ member.profile_picture.url|default:'/static/images/default-avatar.png' }}" 
+                                         class="rounded-circle" style="width: 20px; height: 20px;">
+                                    {{ member.username }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <h6>Projects:</h6>
+                        <ul class="list-unstyled">
+                            {% for project in group.projects.all %}
+                                <li>
+                                    <i class="fas fa-project-diagram"></i>
+                                    {{ project.title }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{% url 'group_detail' group.id %}" class="btn btn-primary btn-sm">View Details</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">No groups created yet.</div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

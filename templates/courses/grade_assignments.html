@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2>Grade Assignments: {{ assignment.title }}</h2>
+            <p>Course: {{ assignment.course.title }}</p>
+            <p>Due Date: {{ assignment.due_date|date:"M d, Y" }}</p>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Submissions</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Submitted Date</th>
+                                    <th>File</th>
+                                    <th>Grade</th>
+                                    <th>Feedback</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for submission in submissions %}
+                                <tr>
+                                    <td>{{ submission.student.username }}</td>
+                                    <td>{{ submission.submitted_at|date:"M d, Y H:i" }}</td>
+                                    <td>
+                                        <a href="{{ submission.submission_file.url }}" target="_blank" class="btn btn-sm btn-info">
+                                            View Submission
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <form method="post" class="grade-form" id="form-{{ submission.id }}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="submission_id" value="{{ submission.id }}">
+                                            <input type="number" name="grade" value="{{ submission.grade|default:'' }}" 
+                                                   class="form-control form-control-sm" step="0.01" min="0" max="100">
+                                    </td>
+                                    <td>
+                                        <textarea name="feedback" class="form-control form-control-sm" rows="2">{{ submission.feedback|default:'' }}</textarea>
+                                    </td>
+                                    <td>
+                                        <button type="submit" class="btn btn-sm btn-primary">Save Grade</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No submissions yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('.grade-form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Grade saved successfully!');
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %} 

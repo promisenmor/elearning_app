@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row py-5">
+        <div class="col-md-6">
+            <h1 class="display-4">Welcome to Unilearn</h1>
+            <p class="lead">Your gateway to interactive online learning</p>
+            {% if not user.is_authenticated %}
+                <div class="mt-4">
+                    <a href="{% url 'student_register' %}" class="btn btn-primary btn-lg me-2">
+                        Join as Student
+                    </a>
+                    <a href="{% url 'instructor_register' %}" class="btn btn-outline-primary btn-lg">
+                        Become an Instructor
+                    </a>
+                </div>
+            {% else %}
+                <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg mt-4">
+                    Go to Dashboard
+                </a>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <img src="{% static 'images/homepics.jpeg' %}" alt="Learning" class="img-fluid">
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row py-5">
+        <div class="col-12 text-center mb-4">
+            <h2>Platform Features</h2>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-video fa-3x mb-3 text-primary"></i>
+                    <h5 class="card-title">Live Video Classes</h5>
+                    <p class="card-text">Interactive video sessions with real-time participation</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-tasks fa-3x mb-3 text-primary"></i>
+                    <h5 class="card-title">Assignments & Quizzes</h5>
+                    <p class="card-text">Comprehensive assessment tools for better learning</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-comments fa-3x mb-3 text-primary"></i>
+                    <h5 class="card-title">Discussion Forums</h5>
+                    <p class="card-text">Engage in meaningful discussions with peers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

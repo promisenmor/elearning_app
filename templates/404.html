@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Page Not Found{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2 text-center">
+        <div class="error-template">
+            <h1>Oops!</h1>
+            <h2>404 Not Found</h2>
+            <div class="error-details my-4">
+                Sorry, the page you requested could not be found.
+            </div>
+            <div class="error-actions">
+                <a href="{% url 'home' %}" class="btn btn-primary">
+                    <span class="me-2">⌂</span>
+                    Take Me Home
+                </a>
+                <a href="{% url 'course_list' %}" class="btn btn-secondary ms-2">
+                    <span class="me-2">📚</span>
+                    My Courses
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

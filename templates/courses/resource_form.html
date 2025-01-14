@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Add Resource - {{ course.title }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button type="submit" class="btn btn-primary">Add Resource</button>
+                        <a href="{% url 'resource_list' course.id %}" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('id_file');
+    const urlInput = document.getElementById('id_url');
+
+    function toggleInputs() {
+        if (fileInput.value) {
+            urlInput.disabled = true;
+        } else if (urlInput.value) {
+            fileInput.disabled = true;
+        } else {
+            urlInput.disabled = false;
+            fileInput.disabled = false;
+        }
+    }
+
+    fileInput.addEventListener('change', toggleInputs);
+    urlInput.addEventListener('input', toggleInputs);
+});
+</script>
+{% endblock %} 

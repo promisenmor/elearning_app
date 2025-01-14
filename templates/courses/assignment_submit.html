@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h3>Submit Assignment: {{ assignment.title }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h5>Description:</h5>
+                    <p>{{ assignment.description }}</p>
+                    <p><strong>Due Date:</strong> {{ assignment.due_date }}</p>
+                </div>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary">Submit Assignment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

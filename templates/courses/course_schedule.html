@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container">
+    <h2>Course Schedule - {{ course.title }}</h2>
+
+    {% if form %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>Add New Schedule</h4>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary">Add Schedule</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Upcoming Sessions</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Location</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for schedule in schedules %}
+                                <tr>
+                                    <td>{{ schedule.title }}</td>
+                                    <td>{{ schedule.start_time|date:"M d, Y" }}</td>
+                                    <td>
+                                        {{ schedule.start_time|time:"H:i" }} - 
+                                        {{ schedule.end_time|time:"H:i" }}
+                                    </td>
+                                    <td>
+                                        {% if schedule.meeting_link %}
+                                            <a href="{{ schedule.meeting_link }}" target="_blank">
+                                                Join Online
+                                            </a>
+                                        {% else %}
+                                            {{ schedule.location }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if schedule.meeting_link %}
+                                            <a href="{{ schedule.meeting_link }}" class="btn btn-sm btn-primary">
+                                                Join Meeting
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No scheduled sessions.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

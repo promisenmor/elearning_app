@@ -1,0 +1,36 @@
+# Core Django
+Django>=4.2.0
+django-crispy-forms>=2.0
+Pillow>=9.0.0  # For image handling
+
+# Database
+psycopg2-binary>=2.9.3  # PostgreSQL adapter
+
+# Channels for WebSocket support
+channels>=4.0.0
+channels-redis>=4.1.0
+daphne>=4.0.0  # ASGI server
+
+# Security
+django-environ>=0.10.0  # For environment variables
+python-dotenv>=1.0.0
+
+# Development tools
+django-debug-toolbar>=4.2.0
+
+# File handling
+python-magic>=0.4.27  # For file type detection
+
+# Time zone support
+pytz>=2023.3
+
+# WSGI server
+gunicorn>=21.2.0
+
+# Redis for caching and channels
+redis>=5.0.0
+
+# For testing
+coverage>=7.2.0
+pytest>=7.3.0
+pytest-django>=4.5.0 

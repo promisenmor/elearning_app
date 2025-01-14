@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Server Error{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2 text-center">
+        <div class="error-template">
+            <h1>Oops!</h1>
+            <h2>500 Server Error</h2>
+            <div class="error-details my-4">
+                Sorry, something went wrong on our end. We're working to fix it.
+            </div>
+            <div class="error-actions">
+                <a href="{% url 'home' %}" class="btn btn-primary">
+                    <span class="me-2">⌂</span>
+                    Take Me Home
+                </a>
+                <a href="javascript:history.back()" class="btn btn-secondary ms-2">
+                    <span class="me-2">↩</span>
+                    Go Back
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

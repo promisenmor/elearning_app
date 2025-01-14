@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h3>Quiz Results: {{ quiz.title }}</h3>
+            </div>
+            <div class="card-body">
+                {% if submission %}
+                    <h4>Your Score: {{ submission.score }}</h4>
+                    <p>Submitted on: {{ submission.submitted_at }}</p>
+                {% else %}
+                    <p>No submission found for this quiz.</p>
+                {% endif %}
+                <a href="{% url 'course_detail' quiz.course.pk %}" class="btn btn-primary">
+                    Back to Course
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

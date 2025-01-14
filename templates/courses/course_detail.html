@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <!-- Course Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>{{ course.title }}</h2>
+            <p class="text-muted">
+                <i class="fas fa-user"></i> Instructor: {{ course.instructor.username }} |
+                <i class="fas fa-calendar"></i> {{ course.start_date|date:"M d, Y" }} - {{ course.end_date|date:"M d, Y" }}
+            </p>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if not is_enrolled and not is_instructor %}
+                <form method="post" action="{% url 'enroll_course' course.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Enroll Now
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Course Navigation -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav class="nav nav-pills nav-fill bg-white p-2 rounded">
+                <a class="nav-link active" href="#materials" data-bs-toggle="tab">Materials</a>
+                <a class="nav-link" href="#assignments" data-bs-toggle="tab">Assignments</a>
+                <a class="nav-link" href="#quizzes" data-bs-toggle="tab">Quizzes</a>
+                <a class="nav-link" href="#discussions" data-bs-toggle="tab">Discussions</a>
+                <a class="nav-link" href="#meetings" data-bs-toggle="tab">Meetings</a>
+                <a class="nav-link" href="#resources" data-bs-toggle="tab">Resources</a>
+                {% if is_instructor %}
+                    <a class="nav-link" href="#students" data-bs-toggle="tab">Students</a>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+
+    <!-- Content Tabs -->
+    <div class="tab-content">
+        <!-- Materials Tab -->
+        <div class="tab-pane fade show active" id="materials">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Course Materials</h4>
+                    {% if is_instructor %}
+                        <a href="{% url 'upload_material' course.id %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-upload"></i> Upload Material
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for material in materials %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">{{ material.title }}</h5>
+                                        <p class="mb-1">{{ material.description }}</p>
+                                    </div>
+                                    <div>
+                                        <a href="{{ material.file.url }}" class="btn btn-outline-primary btn-sm">
+                                            {% if material.is_video %}
+                                                <i class="fas fa-play"></i> Watch
+                                            {% else %}
+                                                <i class="fas fa-download"></i> Download
+                                            {% endif %}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted">No materials uploaded yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assignments Tab -->
+        <div class="tab-pane fade" id="assignments">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Assignments</h4>
+                    {% if is_instructor %}
+                        <a href="{% url 'create_assignment' course.id %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Create Assignment
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for assignment in assignments %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">{{ assignment.title }}</h5>
+                                        <p class="mb-1">{{ assignment.description }}</p>
+                                        <small class="text-muted">
+                                            Due: {{ assignment.due_date|date:"M d, Y H:i" }}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        {% if is_instructor %}
+                                            <a href="{% url 'grade_assignment' assignment.id %}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-check"></i> Grade
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'submit_assignment' assignment.id %}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-upload"></i> Submit
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted">No assignments created yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quizzes Tab -->
+        <div class="tab-pane fade" id="quizzes">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Quizzes</h4>
+                    {% if is_instructor %}
+                        <a href="{% url 'create_quiz' course.id %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Create Quiz
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for quiz in quizzes %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">{{ quiz.title }}</h5>
+                                        <p class="mb-1">{{ quiz.description }}</p>
+                                        <small class="text-muted">
+                                            Time Limit: {{ quiz.time_limit }} minutes |
+                                            Due: {{ quiz.due_date|date:"M d, Y H:i" }}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'take_quiz' quiz.id %}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            {% if is_instructor %}
+                                                <i class="fas fa-eye"></i> View
+                                            {% else %}
+                                                <i class="fas fa-pen"></i> Take Quiz
+                                            {% endif %}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted">No quizzes available yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Discussions Tab -->
+        <div class="tab-pane fade" id="discussions">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Discussions</h4>
+                    <a href="{% url 'discussion_list' course.id %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-comments"></i> View All Discussions
+                    </a>
+                </div>
+                <div class="card-body">
+                    <!-- Recent discussions preview will be shown here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Meetings Tab -->
+        <div class="tab-pane fade" id="meetings">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Video Meetings</h4>
+                    <div>
+                        <a href="{% url 'meeting_calendar' course.id %}" class="btn btn-outline-primary btn-sm me-2">
+                            <i class="fas fa-calendar"></i> Calendar View
+                        </a>
+                        {% if is_instructor %}
+                            <a href="{% url 'create_meeting' course.id %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-video"></i> Schedule Meeting
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Upcoming meetings will be shown here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Resources Tab -->
+        <div class="tab-pane fade" id="resources">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Course Resources</h4>
+                    <a href="{% url 'resource_list' course.id %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-folder"></i> View All Resources
+                    </a>
+                </div>
+                <div class="card-body">
+                    <!-- Resources preview will be shown here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Students Tab (Instructor Only) -->
+        {% if is_instructor %}
+        <div class="tab-pane fade" id="students">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Enrolled Students</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Progress</th>
+                                    <th>Last Access</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in course.students.all %}
+                                    <tr>
+                                        <td>
+                                            <img src="{{ student.profile_picture.url|default:'/static/images/default-avatar.png' }}" 
+                                                 class="rounded-circle" style="width: 30px; height: 30px;">
+                                            {{ student.username }}
+                                        </td>
+                                        <td>
+                                            <!-- Add progress percentage here -->
+                                        </td>
+                                        <td>
+                                            <!-- Add last access time here -->
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'student_progress' course.id student.id %}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                View Progress
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center">No students enrolled yet.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Activate tab based on hash in URL
+    const hash = window.location.hash;
+    if (hash) {
+        const tab = document.querySelector(`a[href="${hash}"]`);
+        if (tab) {
+            new bootstrap.Tab(tab).show();
+        }
+    }
+
+    // Update URL hash when tab changes
+    const tabs = document.querySelectorAll('a[data-bs-toggle="tab"]');
+    tabs.forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function(e) {
+            window.location.hash = e.target.getAttribute('href');
+        });
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h3>Login</h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+                <div class="mt-3">
+                    <p>Don't have an account?</p>
+                    <a href="{% url 'student_register' %}" class="btn btn-outline-primary me-2">Register as Student</a>
+                    <a href="{% url 'instructor_register' %}" class="btn btn-outline-secondary">Register as Instructor</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

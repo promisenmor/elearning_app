@@ -1,0 +1,211 @@
+/* Course Grid Layout */
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+}
+
+/* Search Bar */
+.search-bar {
+    background-color: var(--white);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.search-input {
+    border: 2px solid #E0E0E0;
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0,86,210,0.1);
+}
+
+/* Course Progress */
+.progress-circle {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.progress-circle-bg {
+    fill: none;
+    stroke: #E0E0E0;
+    stroke-width: 4;
+}
+
+.progress-circle-value {
+    fill: none;
+    stroke: var(--primary-color);
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.3s ease;
+}
+
+/* Quiz Timer */
+.quiz-timer {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: var(--white);
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: var(--white);
+    padding: 1.5rem;
+    border-radius: 8px;
+    height: 100%;
+}
+
+.dashboard-card-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.dashboard-card-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-card-label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.9;
+}
+
+/* Resource Categories */
+.resource-category {
+    border-left: 4px solid var(--primary-color);
+    margin-bottom: 2rem;
+}
+
+.resource-item {
+    transition: all 0.2s ease;
+}
+
+.resource-item:hover {
+    background-color: var(--background-light);
+}
+
+/* Group Cards */
+.group-card {
+    transition: transform 0.2s ease;
+}
+
+.group-card:hover {
+    transform: translateY(-5px);
+}
+
+.group-members {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.member-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+/* Notifications */
+.notification-item {
+    border-left: 4px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.notification-item.unread {
+    border-left-color: var(--primary-color);
+    background-color: rgba(0, 86, 210, 0.05);
+}
+
+.notification-item:hover {
+    background-color: var(--background-light);
+}
+
+/* Discussion Threads */
+.discussion-thread {
+    border-left: 2px solid var(--background-light);
+    margin-left: 2rem;
+    padding-left: 1rem;
+}
+
+.reply-form {
+    display: none;
+}
+
+.reply-form.active {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Resource Preview */
+.resource-preview {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 1rem;
+}
+
+.pdf-preview {
+    width: 100%;
+    height: 500px;
+}
+
+/* Group Project Timeline */
+.project-timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.project-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--primary-color);
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 2rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2rem;
+    top: 0;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+} 
