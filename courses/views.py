@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Course, CourseMaterial, Assignment, AssignmentSubmission, Attendance, Quiz, Choice, QuizSubmission, Announcement, CourseSchedule, DiscussionTopic, DiscussionReply, Notification, ResourceCategory, CourseResource, StudentGroup, GroupProject, VideoMeeting, MeetingAttendance
-from .forms import CourseForm, MaterialForm, AssignmentForm, SubmissionForm, AnnouncementForm, ScheduleForm, DiscussionForm, ReplyForm, ResourceForm, ResourceCategoryForm, GroupForm, ProjectForm, VideoMeetingForm
+from .models import Course, CourseMaterial, Assignment, AssignmentSubmission, Attendance, Quiz, Choice, QuizSubmission, Announcement, CourseSchedule, DiscussionTopic, DiscussionReply, Notification, ResourceCategory, CourseResource, StudentGroup, GroupProject, VideoMeeting, MeetingAttendance, Question, Choice, Quiz
+from .forms import CourseForm, MaterialForm, AssignmentForm, SubmissionForm, AnnouncementForm, ScheduleForm, DiscussionForm, ReplyForm, ResourceForm, ResourceCategoryForm, GroupForm, ProjectForm, VideoMeetingForm, QuizForm
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -12,14 +12,20 @@ from django.http import JsonResponse
 import json
 from datetime import timedelta
 from django.urls import reverse
+from django.contrib.auth import get_user_model
 
 
 @login_required
 def course_list(request):
     if request.user.is_instructor:
+        # For instructors, show courses they teach
         courses = Course.objects.filter(instructor=request.user)
     else:
-        courses = Course.objects.filter(students=request.user)
+        # For students, show both enrolled courses and available courses
+        enrolled_courses = Course.objects.filter(students=request.user)
+        available_courses = Course.objects.exclude(students=request.user)
+        # Combine both querysets
+        courses = enrolled_courses | available_courses
     
     # Search functionality
     search_query = request.GET.get('search', '')
@@ -58,12 +64,13 @@ def course_detail(request, pk):
     }
     return render(request, 'courses/course_detail.html', context)
 
+
 @login_required
 def upload_material(request, course_id):
     if not request.user.is_instructor:
         return redirect('course_list')
     
-    course = get_object_or_404(Course, pk=course_id)
+    course = get_object_or_404(Course, id=course_id)
     if request.method == 'POST':
         form = MaterialForm(request.POST, request.FILES)
         if form.is_valid():
@@ -71,7 +78,7 @@ def upload_material(request, course_id):
             material.course = course
             material.save()
             messages.success(request, 'Material uploaded successfully!')
-            return redirect('course_detail', pk=course_id)
+            return redirect('course_detail', pk=course.id)
     else:
         form = MaterialForm()
     
@@ -151,6 +158,31 @@ def submit_assignment(request, pk):
         'form': form,
         'assignment': assignment
     })
+
+@login_required
+def create_quiz(request, course_id):
+    course = get_object_or_404(Course, pk=course_id)
+    if not request.user.is_instructor or request.user != course.instructor:
+        return redirect('course_detail', pk=course_id)
+    
+    if request.method == 'POST':
+        form = QuizForm(request.POST)
+        if form.is_valid():
+            quiz = form.save(commit=False)
+            quiz.course = course
+            quiz.save()
+            messages.success(request, 'Quiz created successfully!')
+            return redirect('course_detail', pk=course_id)
+    else:
+        form = QuizForm()
+    
+    return render(request, 'courses/create_quiz.html', {
+        'form': form,
+        'course': course
+    })  
+
+
+
 
 @login_required
 def take_quiz(request, quiz_id):
@@ -248,6 +280,33 @@ def dashboard(request):
     
     return render(request, 'courses/dashboard.html', context)
 
+
+@login_required
+def create_assignment(request, course_id):
+    course = get_object_or_404(Course, pk=course_id)
+    if not request.user.is_instructor or request.user != course.instructor:
+        return redirect('course_detail', pk=course_id)
+    
+    if request.method == 'POST':
+        form = AssignmentForm(request.POST)
+        if form.is_valid():
+            assignment = form.save(commit=False)
+            assignment.course = course
+            assignment.save()
+            messages.success(request, 'Assignment created successfully!')
+            return redirect('course_detail', pk=course_id)
+    else:
+        form = AssignmentForm()
+    
+    return render(request, 'courses/create_assignment.html', {
+        'form': form,
+        'course': course
+    })
+
+
+
+
+
 @login_required
 def grade_assignment(request, assignment_id):
     if not request.user.is_instructor:
@@ -278,7 +337,20 @@ def student_progress(request, course_id, student_id):
         return redirect('course_list')
     
     course = get_object_or_404(Course, pk=course_id)
+    
+    # Use get_user_model() to get the correct User model
+    User = get_user_model()
     student = get_object_or_404(User, pk=student_id)
+    
+    # Verify the instructor has access to this course
+    if request.user != course.instructor:
+        messages.error(request, "You don't have permission to view this student's progress.")
+        return redirect('course_list')
+    
+    # Verify the student is enrolled in this course
+    if student not in course.students.all():
+        messages.error(request, "This student is not enrolled in this course.")
+        return redirect('course_detail', pk=course_id)
     
     # Get all assignments and their submissions
     assignments = Assignment.objects.filter(course=course)
@@ -299,14 +371,35 @@ def student_progress(request, course_id, student_id):
         student=student
     )
     
-    return render(request, 'courses/student_progress.html', {
+    # Calculate overall progress
+    total_assignments = assignments.count()
+    completed_assignments = submissions.filter(grade__isnull=False).count()
+    
+    total_quizzes = Quiz.objects.filter(course=course).count()
+    completed_quizzes = quiz_results.filter(completed=True).count()
+    
+    if total_assignments + total_quizzes > 0:
+        progress_percentage = ((completed_assignments + completed_quizzes) / 
+                             (total_assignments + total_quizzes)) * 100
+    else:
+        progress_percentage = 0
+    
+    context = {
         'course': course,
         'student': student,
         'assignments': assignments,
         'submissions': submissions,
         'attendance_records': attendance_records,
-        'quiz_results': quiz_results
-    })
+        'quiz_results': quiz_results,
+        'progress_percentage': round(progress_percentage, 1),
+        'completed_assignments': completed_assignments,
+        'total_assignments': total_assignments,
+        'completed_quizzes': completed_quizzes,
+        'total_quizzes': total_quizzes,
+        'now': timezone.now()
+    }
+    
+    return render(request, 'courses/student_progress.html', context)
 
 def home(request):
     if request.user.is_authenticated:

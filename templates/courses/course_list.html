@@ -13,19 +13,41 @@
 </div>
 
 <div class="row">
+    {% if courses %}
+        <div class="col-12 mb-3">
+            <p class="text-muted">Number of courses: {{ courses|length }}</p>
+        </div>
+    {% endif %}
+    
     {% for course in courses %}
         <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">{{ course.title }}</h5>
                     <p class="card-text">{{ course.description|truncatewords:30 }}</p>
-                    <a href="{% url 'course_detail' course.pk %}" class="btn btn-primary">View Course</a>
+                    {% if user.is_instructor %}
+                        <a href="{% url 'course_detail' course.pk %}" class="btn btn-primary">View Course</a>
+                    {% else %}
+                        {% if user in course.students.all %}
+                            <a href="{% url 'course_detail' course.pk %}" class="btn btn-primary">View Course</a>
+                            <a href="{% url 'unenroll_course' course.pk %}" class="btn btn-danger">Unenroll</a>
+                        {% else %}
+                            <a href="{% url 'enroll_course' course.pk %}" class="btn btn-success">Enroll</a>
+                        {% endif %}
+                    {% endif %}
                 </div>
             </div>
         </div>
     {% empty %}
         <div class="col-12">
             <p>No courses available.</p>
+            <p class="text-muted">
+                {% if user.is_instructor %}
+                    You haven't created any courses yet. Use the "Create New Course" button above to get started.
+                {% else %}
+                    There are no courses available at the moment.
+                {% endif %}
+            </p>
         </div>
     {% endfor %}
 </div>

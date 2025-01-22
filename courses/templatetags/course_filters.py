@@ -4,4 +4,10 @@ register = template.Library()
 
 @register.filter
 def filter_submission(submissions, assignment):
-    return submissions.filter(assignment=assignment).first() 
+    """
+    Filter submissions to get the submission for a specific assignment
+    """
+    try:
+        return submissions.get(assignment=assignment)
+    except:
+        return None 

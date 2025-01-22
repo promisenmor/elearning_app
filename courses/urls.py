@@ -1,17 +1,21 @@
 from django.urls import path
 from . import views
 
+
 urlpatterns = [
     path('', views.course_list, name='course_list'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('create/', views.create_course, name='create_course'),
+    path('<int:course_id>/upload/', views.upload_material, name='upload_material'),
     path('<int:pk>/', views.course_detail, name='course_detail'),
     path('<int:pk>/enroll/', views.enroll_course, name='enroll_course'),
     path('<int:pk>/unenroll/', views.unenroll_course, name='unenroll_course'),
     path('<int:course_id>/attendance/', views.mark_attendance, name='mark_attendance'),
     path('<int:course_id>/attendance/view/', views.view_attendance, name='view_attendance'),
+    path('<int:course_id>/assignments/create/', views.create_assignment, name='create_assignment'),
     path('assignment/<int:assignment_id>/submit/', views.submit_assignment, name='submit_assignment'),
     path('assignment/<int:assignment_id>/grade/', views.grade_assignment, name='grade_assignment'),
+    path('<int:course_id>/quizzes/create/', views.create_quiz, name='create_quiz'),
     path('quiz/<int:quiz_id>/take/', views.take_quiz, name='take_quiz'),
     path('quiz/<int:pk>/results/', views.quiz_results, name='quiz_results'),
     path('<int:course_id>/student/<int:student_id>/progress/', views.student_progress, name='student_progress'),
@@ -28,4 +32,6 @@ urlpatterns = [
     path('meeting/<int:meeting_id>/attendance/', views.track_attendance, name='track_attendance'),
     path('meeting/<int:meeting_id>/attendance/view/', views.get_meeting_attendance, name='get_meeting_attendance'),
     path('course/<int:course_id>/meetings/events/', views.get_meeting_events, name='get_meeting_events'),
+    path('<int:course_id>/resources/', views.resource_list, name='resource_list'),
+    path('<int:course_id>/resources/create/', views.create_resource, name='create_resource'),
 ] 

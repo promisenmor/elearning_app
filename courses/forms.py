@@ -1,5 +1,5 @@
 from django import forms
-from .models import Course, CourseMaterial, Assignment, AssignmentSubmission, Announcement, CourseSchedule, DiscussionTopic, DiscussionReply, ResourceCategory, CourseResource, StudentGroup, GroupProject, VideoMeeting
+from .models import Course, CourseMaterial, Assignment, AssignmentSubmission, Announcement, CourseSchedule, DiscussionTopic, DiscussionReply, ResourceCategory, CourseResource, StudentGroup, GroupProject, VideoMeeting, Quiz
 
 class CourseForm(forms.ModelForm):
     class Meta:
@@ -11,9 +11,16 @@ class MaterialForm(forms.ModelForm):
         model = CourseMaterial
         fields = ['title', 'description', 'file', 'is_video']
 
+        
+
 class AssignmentForm(forms.ModelForm):
     class Meta:
         model = Assignment
+        fields = ['title', 'description', 'due_date', 'max_points']
+
+class QuizForm(forms.ModelForm):
+    class Meta:
+        model = Quiz
         fields = ['title', 'description', 'due_date', 'max_points']
 
 class SubmissionForm(forms.ModelForm):
@@ -49,12 +56,12 @@ class ReplyForm(forms.ModelForm):
 class ResourceCategoryForm(forms.ModelForm):
     class Meta:
         model = ResourceCategory
-        fields = ['name', 'description', 'order']
+        fields = ['name', 'description']
 
 class ResourceForm(forms.ModelForm):
     class Meta:
         model = CourseResource
-        fields = ['category', 'title', 'description', 'file', 'url', 'order']
+        fields = ['title', 'description', 'category', 'file', 'url']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
         }

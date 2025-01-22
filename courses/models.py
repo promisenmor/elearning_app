@@ -1,8 +1,11 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
+from django.conf import settings
 
-User = get_user_model()
+User = settings.AUTH_USER_MODEL
+
+
 
 class Course(models.Model):
     title = models.CharField(max_length=200)
@@ -69,6 +72,7 @@ class Quiz(models.Model):
     time_limit = models.IntegerField(help_text="Time limit in minutes")
     due_date = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
+    max_points = models.IntegerField(default=100)
 
     def __str__(self):
         return self.title
@@ -162,25 +166,27 @@ class GroupProject(models.Model):
     submission = models.FileField(upload_to='group_projects/', blank=True) 
 
 class ResourceCategory(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='resource_categories')
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    order = models.IntegerField(default=0)
-
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='resource_categories')
+    
     class Meta:
-        ordering = ['order']
+        verbose_name_plural = "Resource Categories"
+        
+    def __str__(self):
+        return self.name
 
 class CourseResource(models.Model):
-    category = models.ForeignKey(ResourceCategory, on_delete=models.CASCADE, related_name='resources')
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    file = models.FileField(upload_to='course_resources/')
-    url = models.URLField(blank=True)
-    order = models.IntegerField(default=0)
+    category = models.ForeignKey(ResourceCategory, on_delete=models.CASCADE, related_name='resources')
+    file = models.FileField(upload_to='course_resources/', blank=True, null=True)
+    url = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['order', 'created_at'] 
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.title
 
 class CourseProgress(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -249,3 +255,4 @@ class MeetingAttendance(models.Model):
     
     class Meta:
         unique_together = ['meeting', 'student'] 
+

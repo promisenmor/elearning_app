@@ -26,26 +26,27 @@ SECRET_KEY = 'django-insecure-!_4^2*_ygp+1iur9z0#3*9!n%$%69j%q%bmny=u0ziu#=3gncf
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
 import os
 
 INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',  
+    'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.auth',
-    'django.contrib.admin',
-    'courses',
     'accounts',
+    'courses',
     'chat',
     'crispy_forms',
     'channels',  
     'crispy_bootstrap4',
-    # for chat functionality
+    
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
+
+SITE_ID = 1
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
