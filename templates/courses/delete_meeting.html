@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Delete Meeting</h3>
+                </div>
+                <div class="card-body">
+                    <p>Are you sure you want to delete the meeting "{{ meeting.title }}"?</p>
+                    <p class="text-muted">
+                        Scheduled for: {{ meeting.scheduled_time|date:"M d, Y H:i" }}<br>
+                        Duration: {{ meeting.duration }} minutes
+                    </p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Delete Meeting</button>
+                        <a href="{% url 'video_meetings' course.id %}" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

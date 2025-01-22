@@ -34,4 +34,6 @@ urlpatterns = [
     path('course/<int:course_id>/meetings/events/', views.get_meeting_events, name='get_meeting_events'),
     path('<int:course_id>/resources/', views.resource_list, name='resource_list'),
     path('<int:course_id>/resources/create/', views.create_resource, name='create_resource'),
+    path('meeting/<int:meeting_id>/delete/', views.delete_meeting, name='delete_meeting'),
+    path('<int:course_id>/meetings/schedule/', views.scheduled_meetings, name='scheduled_meetings'),
 ] 

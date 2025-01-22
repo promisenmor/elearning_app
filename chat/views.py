@@ -7,11 +7,25 @@ from django.contrib import messages
 @login_required
 def chat_list(request):
     if request.user.is_instructor:
+        # For instructors, show chat rooms for courses they teach
         courses = Course.objects.filter(instructor=request.user)
     else:
+        # For students, show chat rooms for courses they're enrolled in
         courses = Course.objects.filter(students=request.user)
-    chat_rooms = ChatRoom.objects.filter(course__in=courses)
-    return render(request, 'chat/chat_list.html', {'chat_rooms': chat_rooms})
+    
+    # Get or create chat rooms for each course
+    chat_rooms = []
+    for course in courses:
+        # Get or create a general chat room for each course
+        chat_room, created = ChatRoom.objects.get_or_create(
+            course=course,
+            name=f"General - {course.title}"
+        )
+        chat_rooms.append(chat_room)
+    
+    return render(request, 'chat/chat_list.html', {
+        'chat_rooms': chat_rooms
+    })
 
 @login_required
 def chat_room(request, room_name):

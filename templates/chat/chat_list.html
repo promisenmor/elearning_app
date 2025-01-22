@@ -1,18 +1,38 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-8 offset-md-2">
-        <h2>Chat Rooms</h2>
-        <div class="list-group">
-            {% for room in chat_rooms %}
-            <a href="{% url 'chat_room' room.name %}" class="list-group-item list-group-item-action">
-                <h5 class="mb-1">{{ room.name }}</h5>
-                <small>Course: {{ room.course.title }}</small>
-            </a>
-            {% empty %}
-            <p>No chat rooms available.</p>
-            {% endfor %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Chat Rooms</h2>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for room in chat_rooms %}
+                            <a href="{% url 'chat_room' room.name %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">{{ room.name }}</h5>
+                                    <small class="text-muted">{{ room.created_at|timesince }} ago</small>
+                                </div>
+                                <p class="mb-1">Course: {{ room.course.title }}</p>
+                                <small class="text-muted">
+                                    Instructor: {{ room.course.instructor.username }}
+                                </small>
+                            </a>
+                        {% empty %}
+                            <div class="alert alert-info">
+                                {% if user.is_instructor %}
+                                    You don't have any courses with chat rooms yet. Create a course to get started.
+                                {% else %}
+                                    You're not enrolled in any courses with chat rooms yet. Enroll in a course to join its chat room.
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

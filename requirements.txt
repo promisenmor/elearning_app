@@ -1,36 +1,47 @@
-# Core Django
-Django>=4.2.0
-django-crispy-forms>=2.0
-Pillow>=9.0.0  # For image handling
-
-# Database
-psycopg2-binary>=2.9.3  # PostgreSQL adapter
-
-# Channels for WebSocket support
-channels>=4.0.0
-channels-redis>=4.1.0
-daphne>=4.0.0  # ASGI server
-
-# Security
-django-environ>=0.10.0  # For environment variables
-python-dotenv>=1.0.0
-
-# Development tools
-django-debug-toolbar>=4.2.0
-
-# File handling
-python-magic>=0.4.27  # For file type detection
-
-# Time zone support
-pytz>=2023.3
-
-# WSGI server
-gunicorn>=21.2.0
-
-# Redis for caching and channels
-redis>=5.0.0
-
-# For testing
-coverage>=7.2.0
-pytest>=7.3.0
-pytest-django>=4.5.0 
+asgiref==3.8.1
+async-timeout==5.0.1
+attrs==24.3.0
+autobahn==24.4.2
+Automat==24.8.1
+cffi==1.17.1
+channels==4.2.0
+channels-redis==4.2.1
+colorama==0.4.6
+constantly==23.10.4
+coverage==7.6.10
+crispy-bootstrap4==2024.10
+cryptography==44.0.0
+daphne==4.1.2
+Django==4.2.17
+django-crispy-forms==2.3
+django-debug-toolbar==4.4.6
+django-environ==0.11.2
+exceptiongroup==1.2.2
+gunicorn==23.0.0
+hyperlink==21.0.0
+idna==3.10
+incremental==24.7.2
+iniconfig==2.0.0
+msgpack==1.1.0
+packaging==24.2
+pillow==11.1.0
+pluggy==1.5.0
+psycopg2-binary==2.9.10
+pyasn1==0.6.1
+pyasn1-modules==0.4.1
+pycparser==2.22
+pyOpenSSL==24.3.0
+pytest==8.3.4
+pytest-django==4.9.0
+python-dotenv==1.0.1
+python-magic==0.4.27
+pytz==2024.2
+redis==5.2.1
+service-identity==24.2.0
+sqlparse==0.5.3
+tomli==2.2.1
+twisted==24.11.0
+txaio==23.1.1
+typing-extensions==4.12.2
+tzdata==2024.2
+zope.interface==7.2

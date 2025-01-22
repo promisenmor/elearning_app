@@ -6,47 +6,56 @@
         <div class="col-md-8">
             <h2>Attendance Record - {{ course.title }}</h2>
         </div>
-        {% if is_instructor %}
         <div class="col-md-4 text-end">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#markAttendanceModal">
-                <i class="fas fa-clipboard-check"></i> Mark Attendance
-            </button>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary me-2">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            {% if is_instructor %}
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#markAttendanceModal">
+                    <i class="fas fa-clipboard-check"></i> Mark Attendance
+                </button>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
 
     <div class="card">
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Student</th>
-                            {% for date in attendance_dates %}
-                                <th>{{ date|date:"M d" }}</th>
-                            {% endfor %}
-                            <th>Attendance %</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for record in attendance_records %}
+            {% if not attendance_dates %}
+                <div class="alert alert-info">
+                    No attendance records found for this course.
+                </div>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
                             <tr>
-                                <td>{{ record.student.username }}</td>
-                                {% for status in record.statuses %}
-                                    <td>
-                                        {% if status %}
-                                            <i class="fas fa-check text-success"></i>
-                                        {% else %}
-                                            <i class="fas fa-times text-danger"></i>
-                                        {% endif %}
-                                    </td>
+                                <th>Student</th>
+                                {% for date in attendance_dates %}
+                                    <th>{{ date|date:"M d" }}</th>
                                 {% endfor %}
-                                <td>{{ record.percentage }}%</td>
+                                <th>Attendance %</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {% for record in attendance_records %}
+                                <tr>
+                                    <td>{{ record.student.username }}</td>
+                                    {% for status in record.statuses %}
+                                        <td>
+                                            {% if status %}
+                                                <i class="fas fa-check text-success"></i>
+                                            {% else %}
+                                                <i class="fas fa-times text-danger"></i>
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                    <td>{{ record.percentage }}%</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -73,6 +82,7 @@
                                 <tr>
                                     <th>Student</th>
                                     <th>Present</th>
+                                    <th>Absent</th>
                                 </tr>
                             </thead>
                             <tbody>

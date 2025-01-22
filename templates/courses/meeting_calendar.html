@@ -22,16 +22,14 @@
 {% block content %}
 <div class="container">
     <div class="row mb-4">
-        <div class="col-md-8">
-            <h2>Meeting Calendar - {{ course.title }}</h2>
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>Meeting Calendar - {{ course.title }}</h2>
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
         </div>
-        {% if can_create %}
-        <div class="col-md-4 text-end">
-            <a href="{% url 'create_meeting' course.id %}" class="btn btn-primary">
-                <i class="fas fa-video"></i> Schedule Meeting
-            </a>
-        </div>
-        {% endif %}
     </div>
 
     <div class="row">

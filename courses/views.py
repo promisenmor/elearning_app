@@ -15,6 +15,8 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 
 
+
+
 @login_required
 def course_list(request):
     if request.user.is_instructor:
@@ -84,16 +86,20 @@ def upload_material(request, course_id):
     
     return render(request, 'courses/upload_material.html', {'form': form, 'course': course})
 
+
+
 @login_required
 def mark_attendance(request, course_id):
     if not request.user.is_instructor:
         return redirect('course_list')
     
     course = get_object_or_404(Course, pk=course_id)
+    
     if request.method == 'POST':
         date = request.POST.get('date')
         present_students = request.POST.getlist('students')
         
+        # Mark all students as absent first
         for student in course.students.all():
             Attendance.objects.update_or_create(
                 course=course,
@@ -101,22 +107,64 @@ def mark_attendance(request, course_id):
                 date=date,
                 defaults={'is_present': str(student.id) in present_students}
             )
-        messages.success(request, 'Attendance marked successfully!')
         
-    return redirect('course_detail', pk=course_id)
+        messages.success(request, 'Attendance marked successfully!')
+        return redirect('view_attendance', course_id=course_id)  # Redirect to view attendance instead
+    
+    return render(request, 'courses/mark_attendance.html', {
+        'course': course,
+        'today': timezone.now()
+    })
+
+    
 
 @login_required
 def view_attendance(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
-    if request.user.is_instructor:
-        attendances = course.attendance.all()
-    else:
-        attendances = course.attendance.filter(student=request.user)
+    is_instructor = request.user == course.instructor
     
-    return render(request, 'courses/view_attendance.html', {
+    # Get all attendance records for the course
+    attendance_records = Attendance.objects.filter(course=course).order_by('date')
+    
+    # Get unique dates
+    attendance_dates = attendance_records.values_list('date', flat=True).distinct().order_by('date')
+    
+    # Prepare student attendance records
+    student_records = []
+    
+    if is_instructor:
+        students = course.students.all()
+    else:
+        students = [request.user]
+    
+    for student in students:
+        student_attendance = attendance_records.filter(student=student)
+        total_days = attendance_dates.count()
+        present_days = student_attendance.filter(is_present=True).count()
+        
+        # Calculate attendance percentage
+        percentage = (present_days / total_days * 100) if total_days > 0 else 0
+        
+        # Get status for each date
+        statuses = []
+        for date in attendance_dates:
+            status = student_attendance.filter(date=date, is_present=True).exists()
+            statuses.append(status)
+        
+        student_records.append({
+            'student': student,
+            'statuses': statuses,
+            'percentage': round(percentage, 1)
+        })
+    
+    context = {
         'course': course,
-        'attendances': attendances
-    })
+        'is_instructor': is_instructor,
+        'attendance_dates': attendance_dates,
+        'attendance_records': student_records
+    }
+    
+    return render(request, 'courses/view_attendance.html', context)
 
 @login_required
 def create_course(request):
@@ -755,4 +803,55 @@ def meeting_calendar(request, course_id):
     return render(request, 'courses/meeting_calendar.html', {
         'course': course,
         'can_create': can_create
+    })
+
+@login_required
+def delete_meeting(request, meeting_id):
+    meeting = get_object_or_404(VideoMeeting, pk=meeting_id)
+    course = meeting.course
+    
+    # Check if user has permission to delete
+    if not request.user.is_instructor or request.user != course.instructor:
+        messages.error(request, 'You do not have permission to delete this meeting.')
+        return redirect('video_meetings', course_id=course.id)
+    
+    if request.method == 'POST':
+        meeting.delete()
+        messages.success(request, 'Meeting deleted successfully.')
+        return redirect('video_meetings', course_id=course.id)
+    
+    return render(request, 'courses/delete_meeting.html', {
+        'meeting': meeting,
+        'course': course
+    })
+
+@login_required
+def scheduled_meetings(request, course_id):
+    course = get_object_or_404(Course, pk=course_id)
+    
+    # Check if user has access to this course
+    if not (request.user.is_instructor and request.user == course.instructor) and \
+       not (request.user in course.students.all()):
+        messages.error(request, 'You do not have access to this course.')
+        return redirect('course_list')
+    
+    # Get upcoming meetings
+    now = timezone.now()
+    upcoming_meetings = VideoMeeting.objects.filter(
+        course=course,
+        scheduled_time__gte=now
+    ).order_by('scheduled_time')
+    
+    # Get past meetings
+    past_meetings = VideoMeeting.objects.filter(
+        course=course,
+        scheduled_time__lt=now
+    ).order_by('-scheduled_time')
+    
+    return render(request, 'courses/scheduled_meetings.html', {
+        'course': course,
+        'upcoming_meetings': upcoming_meetings,
+        'past_meetings': past_meetings,
+        'now': now,
+        'can_create': request.user.is_instructor and request.user == course.instructor
     }) 

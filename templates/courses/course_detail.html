@@ -33,9 +33,11 @@
                 <a class="nav-link" href="#discussions" data-bs-toggle="tab">Discussions</a>
                 <a class="nav-link" href="#meetings" data-bs-toggle="tab">Meetings</a>
                 <a class="nav-link" href="#resources" data-bs-toggle="tab">Resources</a>
+                <a class="nav-link" href="#attendance" data-bs-toggle="tab">Attendance</a>
                 {% if is_instructor %}
                     <a class="nav-link" href="#students" data-bs-toggle="tab">Students</a>
                 {% endif %}
+                <a class="nav-link" href="{% url 'scheduled_meetings' course.id %}">Scheduled Meetings</a>
             </nav>
         </div>
     </div>
@@ -77,6 +79,28 @@
                             <p class="text-muted">No materials uploaded yet.</p>
                         {% endfor %}
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Tab -->
+        <div class="tab-pane fade" id="attendance">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Attendance</h4>
+                    <div>
+                        {% if is_instructor %}
+                            <a href="{% url 'mark_attendance' course.id %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-clipboard-check"></i> Mark Attendance
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'view_attendance' course.id %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye"></i> View Attendance
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Attendance content will be loaded in the view_attendance page -->
                 </div>
             </div>
         </div>

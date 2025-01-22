@@ -45,6 +45,13 @@
                 </ul>
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
+                        {% if request.resolver_match.url_name != 'dashboard' %}
+                            <li class="nav-item">
+                                <a href="{% url 'dashboard' %}" class="nav-link">
+                                    <i class="fas fa-arrow-left btn btn-secondary"></i> Back to Dashboard
+                                </a>
+                            </li>
+                        {% endif %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                                 {% if user.profile_picture %}
