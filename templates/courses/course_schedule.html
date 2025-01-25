@@ -3,7 +3,16 @@
 
 {% block content %}
 <div class="container">
-    <h2>Course Schedule - {{ course.title }}</h2>
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>Course Schedule - {{ course.title }}</h2>
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
 
     {% if form %}
     <div class="card mb-4">
@@ -60,6 +69,11 @@
                                         {% if schedule.meeting_link %}
                                             <a href="{{ schedule.meeting_link }}" class="btn btn-sm btn-primary">
                                                 Join Meeting
+                                            </a>
+                                        {% endif %}
+                                        {% if can_edit %}
+                                            <a href="#" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
                                             </a>
                                         {% endif %}
                                     </td>

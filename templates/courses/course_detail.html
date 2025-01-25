@@ -31,6 +31,7 @@
                 <a class="nav-link" href="#assignments" data-bs-toggle="tab">Assignments</a>
                 <a class="nav-link" href="#quizzes" data-bs-toggle="tab">Quizzes</a>
                 <a class="nav-link" href="#discussions" data-bs-toggle="tab">Discussions</a>
+                <a class="nav-link" href="{% url 'course_schedule' course.id %}">Schedule</a>
                 <a class="nav-link" href="#meetings" data-bs-toggle="tab">Meetings</a>
                 <a class="nav-link" href="#resources" data-bs-toggle="tab">Resources</a>
                 <a class="nav-link" href="#attendance" data-bs-toggle="tab">Attendance</a>
@@ -216,18 +217,56 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4>Video Meetings</h4>
                     <div>
-                        <a href="{% url 'meeting_calendar' course.id %}" class="btn btn-outline-primary btn-sm me-2">
-                            <i class="fas fa-calendar"></i> Calendar View
-                        </a>
                         {% if is_instructor %}
                             <a href="{% url 'create_meeting' course.id %}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-video"></i> Schedule Meeting
                             </a>
                         {% endif %}
+                        <a href="{% url 'meeting_calendar' course.id %}" class="btn btn-outline-primary btn-sm ms-2">
+                            <i class="fas fa-calendar"></i> Calendar View
+                        </a>
+                        <a href="{% url 'scheduled_meetings' course.id %}" class="btn btn-outline-primary btn-sm ms-2">
+                            <i class="fas fa-list"></i> All Meetings
+                        </a>
                     </div>
                 </div>
                 <div class="card-body">
-                    <!-- Upcoming meetings will be shown here -->
+                    {% if upcoming_meetings %}
+                        {% for meeting in upcoming_meetings %}
+                            <div class="meeting-item border-bottom p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">{{ meeting.title }}</h5>
+                                        <p class="mb-1">
+                                            <i class="far fa-clock"></i> {{ meeting.scheduled_time|date:"M d, Y H:i" }}<br>
+                                            <i class="far fa-hourglass"></i> Duration: {{ meeting.duration }} minutes
+                                        </p>
+                                    </div>
+                                    <div>
+                                        {% if meeting.scheduled_time|date:"Y-m-d H:i" <= now|date:"Y-m-d H:i" %}
+                                            {% if is_instructor %}
+                                                <a href="{% url 'start_meeting' meeting.id %}" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-video"></i> Start Meeting
+                                                </a>
+                                            {% else %}
+                                                <a href="{% url 'live_meeting_room' meeting.id %}" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-video"></i> Join Meeting
+                                                </a>
+                                            {% endif %}
+                                        {% else %}
+                                            <button class="btn btn-secondary btn-sm" disabled>
+                                                Not Started Yet
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p class="text-center text-muted">No upcoming meetings scheduled.</p>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-center text-muted">No upcoming meetings scheduled.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>

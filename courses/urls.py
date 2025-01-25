@@ -10,6 +10,7 @@ urlpatterns = [
     path('<int:pk>/', views.course_detail, name='course_detail'),
     path('<int:pk>/enroll/', views.enroll_course, name='enroll_course'),
     path('<int:pk>/unenroll/', views.unenroll_course, name='unenroll_course'),
+    path('<int:course_id>/schedule/', views.course_schedule, name='course_schedule'),
     path('<int:course_id>/attendance/', views.mark_attendance, name='mark_attendance'),
     path('<int:course_id>/attendance/view/', views.view_attendance, name='view_attendance'),
     path('<int:course_id>/assignments/create/', views.create_assignment, name='create_assignment'),
@@ -36,4 +37,6 @@ urlpatterns = [
     path('<int:course_id>/resources/create/', views.create_resource, name='create_resource'),
     path('meeting/<int:meeting_id>/delete/', views.delete_meeting, name='delete_meeting'),
     path('<int:course_id>/meetings/schedule/', views.scheduled_meetings, name='scheduled_meetings'),
+    path('meeting/<int:meeting_id>/start/', views.start_meeting, name='start_meeting'),
+    path('meeting/<int:meeting_id>/live/', views.live_meeting_room, name='live_meeting_room'),
 ] 

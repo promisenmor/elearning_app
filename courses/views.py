@@ -56,13 +56,22 @@ def course_detail(request, pk):
     is_enrolled = request.user in course.students.all()
     is_instructor = request.user == course.instructor
     
+    # Get upcoming meetings
+    now = timezone.now()
+    upcoming_meetings = VideoMeeting.objects.filter(
+        course=course,
+        scheduled_time__gte=now
+    ).order_by('scheduled_time')[:5]  # Show only next 5 meetings
+    
     context = {
         'course': course,
         'is_enrolled': is_enrolled,
         'is_instructor': is_instructor,
-        'materials': course.materials.all(),
+        'materials': course.materials.all(),-
         'assignments': course.assignments.all(),
         'quizzes': course.quizzes.all(),
+        'upcoming_meetings': upcoming_meetings,
+        'now': now,
     }
     return render(request, 'courses/course_detail.html', context)
 
@@ -506,8 +515,21 @@ def create_announcement(request, course_id):
 @login_required
 def course_schedule(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
-    schedules = course.schedules.all()
     
+    # Check if user has access to this course
+    if not (request.user.is_instructor and request.user == course.instructor) and \
+       not (request.user in course.students.all()):
+        messages.error(request, 'You do not have access to this course.')
+        return redirect('course_list')
+    
+    # Get all schedules for the course
+    schedules = CourseSchedule.objects.filter(
+        course=course,
+        start_time__gte=timezone.now()
+    ).order_by('start_time')
+    
+    # Only instructors can add schedules
+    form = None
     if request.user.is_instructor and request.user == course.instructor:
         if request.method == 'POST':
             form = ScheduleForm(request.POST)
@@ -515,17 +537,16 @@ def course_schedule(request, course_id):
                 schedule = form.save(commit=False)
                 schedule.course = course
                 schedule.save()
-                messages.success(request, 'Schedule created successfully!')
-                return redirect('course_schedule', course_id=course_id)
+                messages.success(request, 'Schedule added successfully!')
+                return redirect('course_schedule', course_id=course.id)
         else:
             form = ScheduleForm()
-    else:
-        form = None
     
     return render(request, 'courses/course_schedule.html', {
         'course': course,
         'schedules': schedules,
-        'form': form
+        'form': form,
+        'can_edit': request.user.is_instructor and request.user == course.instructor
     })
 
 @login_required
@@ -854,4 +875,39 @@ def scheduled_meetings(request, course_id):
         'past_meetings': past_meetings,
         'now': now,
         'can_create': request.user.is_instructor and request.user == course.instructor
+    }) 
+
+@login_required
+def start_meeting(request, meeting_id):
+    meeting = get_object_or_404(VideoMeeting, pk=meeting_id)
+    course = meeting.course
+    
+    # Check if user is the instructor
+    if not request.user.is_instructor or request.user != course.instructor:
+        messages.error(request, 'Only the instructor can start the meeting.')
+        return redirect('course_detail', pk=course.id)
+    
+    # Update meeting status to started
+    meeting.is_active = True
+    meeting.save()
+    
+    return redirect('live_meeting_room', meeting_id=meeting_id)
+
+@login_required
+def live_meeting_room(request, meeting_id):
+    meeting = get_object_or_404(VideoMeeting, pk=meeting_id)
+    course = meeting.course
+    
+    # Check if user has access
+    if not (request.user.is_instructor and request.user == course.instructor) and \
+       not course.students.filter(id=request.user.id).exists():
+        messages.error(request, 'You do not have access to this meeting.')
+        return redirect('course_detail', pk=course.id)
+    
+    is_instructor = request.user == course.instructor
+    
+    return render(request, 'courses/live_meeting_room.html', {
+        'meeting': meeting,
+        'course': course,
+        'is_instructor': is_instructor
     }) 

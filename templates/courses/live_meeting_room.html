@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Video Area -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3>{{ meeting.title }}</h3>
+                    <div>
+                        {% if is_instructor %}
+                            <button id="shareScreen" class="btn btn-outline-primary">
+                                <i class="fas fa-desktop"></i> Share Screen
+                            </button>
+                        {% endif %}
+                        <button id="toggleVideo" class="btn btn-outline-primary ms-2">
+                            <i class="fas fa-video"></i> Toggle Video
+                        </button>
+                        <button id="toggleAudio" class="btn btn-outline-primary ms-2">
+                            <i class="fas fa-microphone"></i> Toggle Audio
+                        </button>
+                        <button id="leaveRoom" class="btn btn-danger ms-2">
+                            Leave Meeting
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="videoGrid" class="row g-2">
+                        <!-- Video elements will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Participants & Chat -->
+        <div class="col-md-3">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>Participants</h5>
+                </div>
+                <div class="card-body">
+                    <ul id="participantsList" class="list-unstyled">
+                        <!-- Participants will be listed here -->
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5>Chat</h5>
+                </div>
+                <div class="card-body">
+                    <div id="chatMessages" style="height: 300px; overflow-y: auto;">
+                        <!-- Chat messages will appear here -->
+                    </div>
+                    <div class="input-group mt-2">
+                        <input type="text" id="chatInput" class="form-control" placeholder="Type a message...">
+                        <button id="sendMessage" class="btn btn-primary">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+<script>
+    // WebRTC implementation will go here
+    // This is a placeholder for the actual video conferencing implementation
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize WebRTC connections
+        // Handle video/audio streams
+        // Implement chat functionality
+        // Handle screen sharing
+    });
+</script>
+{% endblock %} 
