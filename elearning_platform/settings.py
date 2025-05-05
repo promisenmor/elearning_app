@@ -58,7 +58,7 @@ ASGI_APPLICATION = 'elearning_platform.asgi.application'
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"  # Use this for development
+        "BACKEND": "channels.layers.InMemoryChannelLayer",  # Use this for development
         # For production, use Redis:
         # "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
