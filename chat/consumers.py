@@ -1,24 +1,30 @@
 import json
+import logging
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.utils import timezone
 from .models import ChatRoom, Message
 from django.contrib.auth import get_user_model
 
+logger = logging.getLogger(__name__)
 User = get_user_model()
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        logger.info(f"Attempting WebSocket connection for user: {self.scope['user']}")
         self.user = self.scope["user"]
         if not self.user.is_authenticated:
+            logger.warning(f"Unauthenticated user attempted to connect to WebSocket")
             await self.close()
             return
 
         self.room_name = self.scope['url_route']['kwargs']['room_name']
+        logger.info(f"Attempting to connect to room: {self.room_name}")
         self.room_group_name = f'chat_{self.room_name}'
 
         # Verify user has access to this room
         if not await self.can_access_room():
+            logger.warning(f"User {self.user.username} does not have access to room {self.room_name}")
             await self.close()
             return
 
@@ -27,9 +33,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
+        logger.info(f"User {self.user.username} successfully connected to room {self.room_name}")
         await self.accept()
 
     async def disconnect(self, close_code):
+        logger.info(f"WebSocket disconnected with code: {close_code}")
         # Leave room group
         await self.channel_layer.group_discard(
             self.room_group_name,
@@ -81,9 +89,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def can_access_room(self):
         try:
             room = ChatRoom.objects.get(name=self.room_name)
+            logger.info(f"Found chat room: {room.name} for course: {room.course.title}")
             if self.user.is_instructor:
-                return room.course.instructor == self.user
+                has_access = room.course.instructor == self.user
+                logger.info(f"Instructor access check: {has_access}")
+                return has_access
             else:
-                return room.course.students.filter(id=self.user.id).exists()
+                has_access = room.course.students.filter(id=self.user.id).exists()
+                logger.info(f"Student access check: {has_access}")
+                return has_access
         except ChatRoom.DoesNotExist:
+            logger.error(f"Chat room not found: {self.room_name}")
             return False

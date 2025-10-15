@@ -41,16 +41,19 @@
     const chatForm = document.getElementById('chat-form');
 
     function connectWebSocket() {
-        chatSocket = new WebSocket(
-            'ws://' + window.location.host + '/ws/chat/{{ room.name }}/'
-        );
+        const roomName = encodeURIComponent('{{ room.name }}');
+        const wsUrl = 'ws://' + window.location.host + '/ws/chat/' + roomName + '/';
+        console.log('Attempting to connect to WebSocket:', wsUrl);
+        
+        chatSocket = new WebSocket(wsUrl);
 
         chatSocket.onopen = function(e) {
-            console.log('WebSocket connection established');
+            console.log('WebSocket connection established successfully');
             messageInput.disabled = false;
         };
 
         chatSocket.onmessage = function(e) {
+            console.log('Received message:', e.data);
             const data = JSON.parse(e.data);
             const messageHtml = `
                 <div class="message ${data.user === '{{ request.user.username }}' ? 'text-end' : ''} mb-2">
@@ -65,13 +68,24 @@
         };
 
         chatSocket.onclose = function(e) {
-            console.log('WebSocket connection closed. Attempting to reconnect...');
+            console.log('WebSocket connection closed:', {
+                code: e.code,
+                reason: e.reason,
+                wasClean: e.wasClean
+            });
             messageInput.disabled = true;
             setTimeout(connectWebSocket, 1000);
         };
 
         chatSocket.onerror = function(e) {
-            console.error('WebSocket error:', e);
+            console.error('WebSocket error occurred:', e);
+            // Log additional connection information
+            console.log('Connection details:', {
+                url: wsUrl,
+                readyState: chatSocket.readyState,
+                protocol: chatSocket.protocol,
+                extensions: chatSocket.extensions
+            });
         };
     }
 
